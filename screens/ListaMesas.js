@@ -28,6 +28,7 @@ const ListaMesas = (props) => {
   const [municipio, setMunicipio] = useState("");
   const [departamento, setDepartamento] = useState("");
   const [tipoTarjeton, setTipoTarjeton] = useState("");
+  const [oidTarjeton, setOidTarjeton] = useState("");
   const mesas = [
     {
       Tarjeton: "",
@@ -36,13 +37,13 @@ const ListaMesas = (props) => {
       NombrePuestos: "",
       nombreZonas: "",
       CodigoPuestos: "",
-      NombreMesas: ""
-  }
+      NombreMesas: "",
+    },
   ];
   useEffect(() => {
     axios
       .post(
-        "http://35.231.9.84:8091/scriptcase/app/CountDown/ws_cd/index.php?mesasverificadas",
+        "http://35.228.188.222/countdown/ws_cd/index.php?mesasverificadas",
         {
           user: userName,
         }
@@ -53,27 +54,28 @@ const ListaMesas = (props) => {
         const mesas = [];
         if (status === 200) {
           const mesasVerificadas = response.data["Detalles Mesas"];
-          console.log("data info ", mesasVerificadas)
-          /*           const nombreMesa = mesasVerificadas.nombreMesa;
+          /*        const nombreMesa = mesasVerificadas.nombreMesa;
           const nombreZona = mesasVerificadas.nombreZona;
           const nombrePuesto = mesasVerificadas.nombrePuesto;
           const municipio = mesasVerificadas.municipio;
           const departamento = mesasVerificadas.departamento;
           const tipoTarjeton = mesasVerificadas.tipoTarjeton;
- */
-          /* mesas.push(mesasVerificadas.nombreMesa);
+*/
+          /* 
+          mesas.push(mesasVerificadas.nombreMesa);
           mesas.push(mesasVerificadas.nombreZona);
           mesas.push(mesasVerificadas.nombrePuesto);
           mesas.push(mesasVerificadas.municipio);
           mesas.push(mesasVerificadas.departamento);
-          mesas.push(mesasVerificadas.tipoTarjeton); */
+          mesas.push(mesasVerificadas.tipoTarjeton); 
+*/
+          let oidTarjeton = "";
+          if (mesasVerificadas.tipoTarjeton === "Cámara") {
+            oidTarjeton = 1;
+          } else {
+            oidTarjeton = 2;
+          }
           setData(mesasVerificadas);
-          /* setNombreMesa(nombreMesa);
-          setNombreZona(nombreZona);
-          setNombrePuesto(nombrePuesto);
-          setMunicipio(municipio);
-          setDepartamento(departamento);
-          setTipoTarjeton(tipoTarjeton); */
         }
         if (status === 400) {
           return;
@@ -88,19 +90,22 @@ const ListaMesas = (props) => {
     navigation.navigate("CamaraSenado");
   };
 
-  const onPressMesa= (tarjeton) =>{
+  const onPressMesa = (info) => {
+    
     const dataMesa = {
-      departamento: "Cauca",
-      municipio: "Popayan",
-      lugar: "Colegio Champagnat",
-      puesto: "01",
-      zona: "001",
-      mesa: "002",
+      tarjeton: info.Tarjeton,
+      departamento: info.departamento,
+      municipio: info.municipio,
+      lugar: info.NombrePuestos,
+      zona: info.nombreZonas,
+      puesto: info.CodigoPuestos,
+      mesa: info.NombreMesas,
+      oidMesaVotacion: info.oidMesaVotacion
     };
-    if(tarjeton === "Senado"){
-      navigation.navigate("SenadoView", { ...dataMesa });
-    }else{
-      navigation.navigate("CamaraView", { ...dataMesa });
+    if (info.Tarjeton === "Senado") {
+      navigation.navigate("CamaraSenadoView", { ...dataMesa,  tarjeton: "2" });
+    } else {
+      navigation.navigate("CamaraSenadoView", { ...dataMesa,  tarjeton: "1" });
     }
     /* const dataMesa = {
       departamento: dataEncabezado.departamento,
@@ -116,8 +121,7 @@ const ListaMesas = (props) => {
       mesa: dataEncabezado.mesa,
       mesaCod: dataEncabezado.mesaCod,
     }; */
-
-  }
+  };
 
   const ButtonAdd = () => (
     <View style={styles.viewButton}>
@@ -145,12 +149,21 @@ const ListaMesas = (props) => {
             MESAS REGISTRADAS
           </Text>
           <View style={styles.viewStages}>
-            {console.log("listas: ", data)}
             <FlatList
               data={data}
-              keyExtractor={(item, index) => item.NombreMesas+'-'+item.CodigoPuestos+'-'+item.Tarjeton}
+              keyExtractor={(item, index) =>
+                item.NombreMesas +
+                "-" +
+                item.CodigoPuestos +
+                "-" +
+                item.Tarjeton
+                + "-" +
+                Math.random()
+              }
               renderItem={(itemData) => (
-                <TouchableOpacity onPress={()=>onPressMesa(itemData.item.Tarjeton)}>
+                <TouchableOpacity
+                  onPress={() => onPressMesa(itemData.item)}
+                >
                   <CardContentMesa
                     camaraSenado={itemData.item.Tarjeton}
                     departamento={itemData.item.departamento}

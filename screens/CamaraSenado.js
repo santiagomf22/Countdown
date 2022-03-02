@@ -1,9 +1,12 @@
-import React from "react";
+import React, { useContext } from "react";
 import { StyleSheet, Text, TouchableOpacity, View } from "react-native";
 import Card from "../components/UX/Card";
 import { useNavigation } from "@react-navigation/native";
+import AuthContext from "../components/context/auth/AuthContext";
 
 const CamaraSenado = (props) => {
+  const { rol } = useContext(AuthContext);
+
   const navigation = useNavigation();
 
   const pressCamara = () => {
@@ -16,13 +19,14 @@ const CamaraSenado = (props) => {
   };
   return (
     <View style={styles.container}>
-      <Card style={styles.button}>
-        <TouchableOpacity onPress={pressCamara}>
+      <Card style={ rol === "2" ? styles.buttonDisabled : styles.button } >
+        {console.log("ROL ",rol)}
+        <TouchableOpacity disabled={rol === "2" ? true : false} onPress={pressCamara}>
           <Text style={styles.text}>CAMARA</Text>
         </TouchableOpacity>
       </Card>
-      <Card style={styles.button}>
-        <TouchableOpacity onPress={pressSenado} /* disabled={true} */>
+      <Card style={ rol === "3" ? styles.buttonDisabled : styles.button } >
+        <TouchableOpacity disabled={rol === "3" ? true : false} onPress={pressSenado} /* disabled={true} */>
           <Text style={styles.text}>SENADO</Text>
         </TouchableOpacity>
       </Card>
@@ -44,6 +48,13 @@ const styles = StyleSheet.create({
     height: 50,
     justifyContent: "center",
     backgroundColor: "#FC5C06",
+  },
+  buttonDisabled: {
+    width: "60%",
+    height: 50,
+    justifyContent: "center",
+    backgroundColor: "#FC5C06",
+    opacity: 0.2
   },
   text: { textAlign: "center", fontSize: 20, fontWeight: "bold" },
 });

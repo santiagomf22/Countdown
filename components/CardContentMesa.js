@@ -9,7 +9,7 @@ const CardContentMesa = (props) => {
         Información de la mesa
       </Text>
       <Text style={{ paddingLeft: 10, fontSize: 15, fontWeight: "bold" }}>
-        {props.camaraSenado}
+        {`->${props.camaraSenado}`}
       </Text>
       <View style={styles.rowText}>
         <Text style={styles.textTitle}> Departamento: </Text>
@@ -34,7 +34,7 @@ const CardContentMesa = (props) => {
         </View>
         <View style={styles.rowText}>
           <Text style={styles.textTitle}> Mesa: </Text>
-          <Text>{props.mesa}</Text>
+          <Text>{props.mesa ? props.mesa.split(" ")[1] : ""}</Text>
         </View>
       </View>
     </View>

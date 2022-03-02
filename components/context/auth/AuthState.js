@@ -10,6 +10,7 @@ const AuthState = (props) => {
     userToken: null,
     userEmail: null,
     nombre: null,
+    rol: null
   };
   const [loginState, dispatch] = useReducer(AuthReducer, initialLoginState);
   const authContext = useMemo(
@@ -21,14 +22,17 @@ const AuthState = (props) => {
         userToken = null;
         let userName = null;
         let nombre = null;
+        let rol = null;
         try {
           userToken = await AsyncStorage.getItem("userToken");
           userName = await AsyncStorage.getItem("userName");
           nombre = await AsyncStorage.getItem("Name");
+          rol = await AsyncStorage.getItem("Rol");
+          console.log("Rol authstate: ",rol)
         } catch (e) {
           console.log(e);
         }
-        dispatch({ type: "RETRIEVE_TOKEN", token: userToken, userName, nombre });
+        dispatch({ type: "RETRIEVE_TOKEN", token: userToken, userName, nombre, rol });
         /* }, 1000); */
       },
 
@@ -38,11 +42,13 @@ const AuthState = (props) => {
         const userName = user.userName;
         const userEmail = user.EMAIL;
         const nombre = String(user.NOMBRE);
+        const rol = user.GRUPOS;
 
         try {
           await AsyncStorage.setItem("userToken", userToken);
           await AsyncStorage.setItem("userName", userName);
           await AsyncStorage.setItem("Name", nombre);
+          await AsyncStorage.setItem("Rol", rol);
         } catch (e) {
           console.log(e);
         }
@@ -52,6 +58,7 @@ const AuthState = (props) => {
           token: userToken,
           email: userEmail,
           nombre: nombre,
+          rol: rol
         });
       },
       signOut: async () => {
@@ -79,6 +86,7 @@ const AuthState = (props) => {
         userName: loginState.userName,
         userEmail: loginState.userEmail,
         nombre: loginState.nombre,
+        rol: loginState.rol,
       }}
     >
       {props.children}

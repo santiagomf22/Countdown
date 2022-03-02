@@ -30,4 +30,10 @@ export const partidos = [
       imagen: require("../../assets/voto_no_marcado.png"),
       candidatos: ["Votos"],
     },
+    {
+      partido: "VOTOS INCINERADOS",
+      oid:"11",
+      imagen: require("../../assets/voto_incinerado.png"),
+      candidatos: ["Votos"],
+    },
   ];

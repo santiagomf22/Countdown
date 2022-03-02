@@ -7,14 +7,12 @@ import { DrawerContent } from "./DrawerContent";
 
 import { createDrawerNavigator } from "@react-navigation/drawer";
 import { View, Image } from "react-native";
-import MainTabScreen from "../components/navigator/MainTabScreen";
 import Camara from "./Camara";
-import CamaraView from "./CamaraView";
-import SenadoView from "./SenadoView";
 import Senado from "./Senado";
 import ListaMesas from "./ListaMesas"
 import AgregarMesa from "./AgregarMesa"
 import CamaraSenado from "./CamaraSenado";
+import CamaraSenadoView from "./CamaraSenadoView";
 
 
 const Main = (props) => {
@@ -117,24 +115,11 @@ const Main = (props) => {
             }} 
           />
           <Drawer.Screen
-            name="CamaraView"
-            component={CamaraView}
+            name="CamaraSenadoView"
+            component={CamaraSenadoView}
             options={{
               orientation: "portrait",
               title: "Vista camara",
-              headerTitleAlign: "center",
-              headerStyle: {
-                backgroundColor: '#FC5C06', //Set Header color
-              },
-              headerTitle: (props) => <LogoTitle {...props} />
-            }} 
-          />
-          <Drawer.Screen
-            name="SenadoView"
-            component={SenadoView}
-            options={{
-              orientation: "portrait",
-              title: "Vista senado",
               headerTitleAlign: "center",
               headerStyle: {
                 backgroundColor: '#FC5C06', //Set Header color

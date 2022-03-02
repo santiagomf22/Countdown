@@ -49,7 +49,7 @@ const AgregarMesa = ({ route, navigation }) => {
 
     axios
       .post(
-        "http://35.231.9.84:8091/scriptcase/app/CountDown/ws_cd/index.php?municipios",
+        "http://35.228.188.222/countdown/ws_cd/index.php?municipios",
         {
           departamento: "12",
         }
@@ -60,11 +60,23 @@ const AgregarMesa = ({ route, navigation }) => {
           if (municipios.status !== 400) {
             setListMunicipios(municipios["Lista de municipios"]);
           } else {
+            setListMunicipios([]);
             console.log("Departamentos no encontradas!");
+            Alert.alert(
+              "Error",
+              "Lo sentimos en este momento no se pudieron cargar los municipios, contacte con el administrador",
+              [{ text: "Entendido" }]
+            );
           }
         } else {
           //loading = true;
+          setListMunicipios([]);
           console.log("Departamentos no encontrados!");
+          Alert.alert(
+            "Error",
+            "Lo sentimos en este momento no se pudieron cargar los municipios, contacte con el administrador",
+            [{ text: "Entendido" }]
+          );
         }
       })
       .catch((e) => {
@@ -148,7 +160,7 @@ const AgregarMesa = ({ route, navigation }) => {
     setIsLoadingZonas(true);
     axios
       .post(
-        "http://35.231.9.84:8091/scriptcase/app/CountDown/ws_cd/index.php?zonas",
+        "http://35.228.188.222/countdown/ws_cd/index.php?zonas",
         {
           municipio: cod,
         }
@@ -163,6 +175,7 @@ const AgregarMesa = ({ route, navigation }) => {
             setListZonas(zonas["Lista de municipios"]);
           } else {
             console.log("Zonas no encontradas!");
+            setListZonas([])
             Alert.alert(
               "Error",
               "Lo sentimos en este momento no se pudieron cargar las zonas",
@@ -191,9 +204,10 @@ const AgregarMesa = ({ route, navigation }) => {
       zonaCod: cod,
     }));
     setZona(itemValue);
+    console.log("El codigo zona es: ", cod)
     axios
       .post(
-        "http://35.231.9.84:8091/scriptcase/app/CountDown/ws_cd/index.php?puestos",
+        "http://35.228.188.222/countdown/ws_cd/index.php?puestos",
         {
           zona: cod,
         }
@@ -207,10 +221,20 @@ const AgregarMesa = ({ route, navigation }) => {
             setListPuestos(puestos["Lista de puestos"]);
           } else {
             console.log("Puestos no encontradas!");
+            Alert.alert(
+              "Error",
+              "Lo sentimos en este momento no se pudieron cargar las zonas",
+              [{ text: "Entendido" }]
+            );
           }
         } else {
           //loading = true;
           console.log("Puestos no encontrados!");
+          Alert.alert(
+            "Error",
+            "Lo sentimos en este momento no se pudieron cargar las zonas",
+            [{ text: "Entendido" }]
+          );
         }
       })
       .catch((e) => {
@@ -230,7 +254,7 @@ const AgregarMesa = ({ route, navigation }) => {
     setPuesto(itemValue);
     axios
       .post(
-        "http://35.231.9.84:8091/scriptcase/app/CountDown/ws_cd/index.php?mesas",
+        "http://35.228.188.222/countdown/ws_cd/index.php?mesas",
         {
           puesto: cod,
           user: userName,
@@ -245,10 +269,22 @@ const AgregarMesa = ({ route, navigation }) => {
             setListMesas(mesas["Lista de mesas"]);
           } else {
             console.log("Mesas no encontradas!");
+            Alert.alert(
+              "Error",
+              "Lo sentimos en este momento no se pudieron cargar las mesas",
+              [{ text: "Entendido" }]
+            );
+            setListMesas([]);
           }
         } else {
           //loading = true;
           console.log("Mesas no encontradas!");
+          Alert.alert(
+            "Error",
+            "Lo sentimos en este momento no se pudieron cargar las mesas",
+            [{ text: "Entendido" }]
+          );
+          setListMesas([]);
         }
       })
       .catch((e) => {

@@ -1,0 +1,5 @@
+IP PRUEBA
+http://35.231.9.84:8091/scriptcase/app/CountDown/ws_cd/index.php?
+
+IP PRODUCCION
+http://35.228.188.222/countdown/ws_cd/index.php?

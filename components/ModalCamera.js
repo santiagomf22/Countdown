@@ -26,7 +26,7 @@ function ModalCamera(props) {
 
     const result = await ImagePicker.launchImageLibraryAsync();
 
-    let localUri = result.uri;
+    /* let localUri = result.uri;
     let filename = localUri.split("/").pop();
 
     // Infer the type of the image
@@ -34,7 +34,7 @@ function ModalCamera(props) {
     let type = match ? `image/${match[1]}` : `image`;
 
     const formData = new FormData();
-    formData.append('file', "Hola");
+    formData.append('file', { uri: localUri, name: filename, type }); */
 
     /* let fecha = new Date();
     let { type, uri } = result;
@@ -52,10 +52,10 @@ function ModalCamera(props) {
     formData.append("oidTarjeton", 1);  */
 
     // Explore the result
-    console.log("imagen ", result);
+    //console.log("imagen ", result);
 
     if (!result.cancelled) {
-      props.uriImage(formData);
+      props.uriImage(result);
     }
   };
 
@@ -69,7 +69,10 @@ function ModalCamera(props) {
       return;
     }
 
-    const result = await ImagePicker.launchCameraAsync();
+    const result = await ImagePicker.launchCameraAsync({
+      aspect: [0.5,0.5],
+      quality: 0.5
+    });
 
     // Explore the result
     console.log(result);

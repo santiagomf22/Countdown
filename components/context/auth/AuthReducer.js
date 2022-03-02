@@ -6,6 +6,7 @@ export default (prevState, action) => {
           userToken: action.token,
           userName: action.userName,
           nombre: action.nombre,
+          rol: action.rol,
           isLoading: false,
         };
       case "LOGIN":
@@ -14,6 +15,7 @@ export default (prevState, action) => {
           userName: action.id,
           userToken: action.token,
           userEmail: action.email,
+          rol:action.rol,
           nombre: action.nombre,
           isLoading: false,
         };

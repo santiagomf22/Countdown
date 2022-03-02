@@ -21,7 +21,7 @@ function Login() {
 
   const loginHandle = (userName, password) => {
     axios
-      .post("http://35.231.9.84:8091/scriptcase/app/CountDown/ws_cd/index.php?validacionUser", {
+      .post("http://35.228.188.222/countdown/ws_cd/index.php?validacionUser", {
         user: userName,
         clave: password,
       })

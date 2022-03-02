@@ -18,10 +18,8 @@ import { votosCandidatos } from "../components/data/votosCandidatos";
 import ModalCamera from "../components/ModalCamera";
 import { useIsFocused } from "@react-navigation/native";
 import AuthContext from "../components/context/auth/AuthContext";
-import axios from "axios";
 import { ActivityIndicator } from "react-native-paper";
-
-// import Card from "../components/UX/Card"
+import sendData from "../components/sendData";
 
 const Camara = ({ route, navigation }) => {
   const [votos, setVotos] = useState(votosCandidatos);
@@ -30,9 +28,10 @@ const Camara = ({ route, navigation }) => {
   const [votosMesa, setVotosMesa] = useState(0);
   const [checkedRecuento, setCheckedRecuento] = useState(false);
   const [checkedObservacion, setCheckedObservacion] = useState(false);
+  const [checkedFirmasJurados, setCheckedFirmasJurados] = useState(false);
   const [textObservacion, setTextObservacion] = useState("");
   const [soporte, setSoporte] = useState("");
-  const [allRight, setAllRight] = useState(false);
+  const [soporteCargado, setSoporteCargado] = useState(false);
   const [showModal, setShowModal] = useState(false);
   const [uriImage, setUriImage] = useState("");
   const isFocused = useIsFocused();
@@ -43,25 +42,22 @@ const Camara = ({ route, navigation }) => {
     route.params;
   const { userName } = useContext(AuthContext);
   const [isLoading, setIsLoading] = useState(false);
-  /* useEffect(() => {
-    scrollRef.current?.scrollTo({
-      y: 0,
-      animated: true,
-    });
-  }, [isFocused]); */
 
   useEffect(() => {
-    const unsubscribe = navigation.addListener("focus", () => {
-      cleanData();
-    });
+    setIsLoading(false);
+    cleanData();
+  }, []);
 
-    return unsubscribe;
-  }, [navigation]);
 
   useEffect(() => {
     let total = 0;
     for (const item in totalVotos) {
-      total += totalVotos[item];
+      if (item !== "11") {
+        total += totalVotos[item];
+      }
+    }
+    if (totalVotos["11"]) {
+      total -= totalVotos["11"];
     }
     if (total === parseInt(totalSufragantes)) {
       setConteoCorrecto(true);
@@ -78,99 +74,52 @@ const Camara = ({ route, navigation }) => {
     setVotosMesa(0);
     setTextObservacion("");
     setSoporte("");
-    setAllRight(false);
+    setSoporteCargado(false);
     setShowModal(false);
-    setTotalSufragantes();
+    setTotalSufragantes("");
     setConteoCorrecto(false);
+    setCheckedRecuento(false);
+    setCheckedObservacion(false);
+    setCheckedFirmasJurados(false);
+  };
+  const returnHome = () => {
+    cleanData();
+    scrollRef.current?.scrollTo({
+      y: 0,
+      animated: true,
+    });
+    navigation.navigate("Inicio");
   };
 
-  const enviarDatos = () => {
-    let newJson = {
-      ...votos,
-      oidPuesto: puestoCod,
-      oidMesa: mesaCod,
-      login: userName,
-      tipoTarjeton: "1",
-    };
-    console.log("json ", newJson);
-    if (allRight) {
+  const enviarDatos = async () => {
+    if (soporteCargado) {
       if (conteoCorrecto) {
-        setIsLoading(true);
-        axios
-          .post(
-            "http://35.231.9.84:8091/scriptcase/app/CountDown/ws_cd/index.php?registrarResultadoCandidatos",
-            {
-              ...votos,
-              oidPuesto: puestoCod,
-              oidMesa: mesaCod,
-              login: userName,
-              tipoTarjeton: "1",
-            }
-          )
-          .then((response) => {
-            // Respuesta del servidor
-            const status = response.data.status;
-            console.log("Todo correcto", status);
-            setIsLoading(false);
-
-            if (status === 200) {
-              cleanData();
-              scrollRef.current?.scrollTo({
-                y: 0,
-                animated: true,
-              });
-              navigation.navigate("Inicio");
-              Alert.alert("Exitoso!", "La mesa fue verificada correctamente", [
-                { text: "Entendido" },
-              ]);
-            }
-            if (status === 400) {
-              cleanData();
-              scrollRef.current?.scrollTo({
-                y: 0,
-                animated: true,
-              });
-              navigation.navigate("Inicio");
-              Alert.alert(
-                "Error!",
-                "Disculpe las molestias, vuelva a intentarlo",
-                [{ text: "Entendido" }]
-              );
-              return;
-            }
-            if (status === 405) {
-              cleanData();
-              scrollRef.current?.scrollTo({
-                y: 0,
-                animated: true,
-              });
-              navigation.navigate("Inicio");
-              Alert.alert("Error!", "Esta mesa ya fue registrada", [
-                { text: "Entendido" },
-              ]);
-              return;
-            }
-          })
-          .catch((e) => {
-            console.log(e);
-          });
-
-        axios
-          .post(
-            "http://35.231.9.84:8091/scriptcase/app/CountDown/ws_cd/index.php?cargarSoporte",
-            uriImage,
-            {
-              headers: {
-                "Content-Type": "multipart/form-data",
-              },
-            }
-          )
-          .then((response) => {
-            console.log("Carga soporte: ", response.data);
-          })
-          .catch((e) => {
-            console.log(e);
-          });
+        if (
+          (checkedObservacion && textObservacion !== "") ||
+          !checkedObservacion
+        ) {
+          setIsLoading(true);
+          sendData(
+            votos,
+            puestoCod,
+            mesaCod,
+            userName,
+            "1",
+            checkedRecuento,
+            textObservacion,
+            checkedFirmasJurados,
+            totalSufragantes,
+            uriImage
+          );
+          setIsLoading(false);
+          returnHome();
+        } else {
+          Alert.alert(
+            "Error",
+            "Si marcaste la casilla observacion debes escribir en el area de texto ",
+            [{ text: "Entendido" }]
+          );
+        }
       } else {
         Alert.alert(
           "Error",
@@ -197,6 +146,7 @@ const Camara = ({ route, navigation }) => {
       if (votosPartido[votosCandidato]) {
         voto = parseInt(votosPartido[votosCandidato]);
       }
+
       suma += voto;
     }
     setTotalVotos({ ...totalVotos, [partido]: suma });
@@ -209,80 +159,33 @@ const Camara = ({ route, navigation }) => {
   };
 
   const onPressCargarSoporte = () => {
-    let allFieldsFilled = true;
-    for (const key in votos) {
-      const partido = votos[key];
-      for (const candidato in partido) {
-        const element = partido[candidato];
-        if (element === "") {
-          allFieldsFilled = false;
-        }
-      }
-    }
-    if (!allFieldsFilled) {
-      setShowModal(true);
-    } else {
-      Alert.alert(
-        "Error",
-        "Antes de cargar el soporte debe llenar todos los campos!",
-        [{ text: "Entendido" }]
-      );
-    }
+    setShowModal(true);
   };
 
-  const saveUri = (response) => {
+  const saveUri = (result) => {
     Alert.alert("Correcto", "Archivo subido con exito!", [
       { text: "Entendido" },
     ]);
-    /* let fecha = new Date();
-    let { type, uri } = response;
-    const fileToUpload = {
-      name: "minion.jpg",
-      uri,
-      fecha,
-      type: "application/" + type,
-    };
-    console.log("File to upload ", fileToUpload);
+
+    let localUri = result.uri;
+    let filename = localUri.split("/").pop();
+
+    // Infer the type of the image
+    let match = /\.(\w+)$/.exec(filename);
+    let type = match ? `image/${match[1]}` : `image`;
+
     const formData = new FormData();
-    formData.append("file", fileToUpload);
-      formData.append("login", userName);
+    formData.append("file", { uri: localUri, name: filename, type });
+    formData.append("login", userName);
     formData.append("oidMesa", mesaCod);
     formData.append("oidPuesto", puestoCod);
-    formData.append("oidTarjeton", 1); */
+    formData.append("oidTarjeton", 1);
 
-    setUriImage(response);
-    setAllRight(true);
+    setUriImage(formData);
+    setSoporteCargado(true);
     setShowModal(false);
-    let formData = response;
-
-    console.log("soportes: ", formData);
-    /* fetch('http://35.231.9.84:8091/scriptcase/app/CountDown/ws_cd/index.php?cargarSoporte', {
-    method: 'POST',
-    body: formData,
-    header: {
-      'content-type': 'multipart/form-data',
-    },
-  }).then(response => response.json())
-  .then(data => console.log(data));
-} */
-
-    axios
-          .post(
-             "http://35.188.72.137/siproj/ws_pme/index.php?cargarSoporte",
-            formData,
-            {
-              headers: {
-                "Content-Type": "multipart/form-data"
-              },
-            }
-          )
-          .then((response) => {
-            console.log("Carga soporte: ", response.data);
-          })
-          .catch((e) => {
-            console.log(e);
-          });
-  }
+    console.log("soporte FormData: ", formData);
+  };
 
   return !isLoading ? (
     <View
@@ -316,7 +219,7 @@ const Camara = ({ route, navigation }) => {
               style={{ flexDirection: "row", justifyContent: "space-around" }}
             >
               <Text>ZONA: {zona} </Text>
-              <Text>PUESTO: 00 </Text>
+              <Text>PUESTO: {puestoCod} </Text>
               <Text>MESA: {mesa}</Text>
             </View>
           </View>
@@ -348,6 +251,7 @@ const Camara = ({ route, navigation }) => {
                       <TextInput
                         keyboardType="numeric"
                         style={styles.inputNivel}
+                        value={totalSufragantes}
                         onChangeText={(text) => setTotalSufragantes(text)}
                       />
                     </View>
@@ -408,11 +312,12 @@ const Camara = ({ route, navigation }) => {
                             keyboardType="numeric"
                             style={styles.input}
                             placeholder="Ingrese los votos"
+                            // value={}
                             onChangeText={(text) =>
                               handleChange(text, candidato, item.oid)
                             }
                           />
-                          {votos[item.oid][candidato] !== "" && (
+                          {votos[item.oid][candidato] !== 0 && (
                             <Animatable.View animation="bounceIn">
                               <Feather
                                 name="check-circle"
@@ -454,7 +359,9 @@ const Camara = ({ route, navigation }) => {
               <Text style={styles.textoBotonCargar}>Cargar soporte</Text>
             </TouchableOpacity>
             <View style={styles.checkboxContainer}>
-              <Text style={styles.label}>¿Hubo recuento de votos?</Text>
+              <Text style={{ textAlign: "center" }}>
+                ¿Hubo recuento de votos?
+              </Text>
               <Checkbox
                 status={checkedRecuento ? "checked" : "unchecked"}
                 onPress={() => {
@@ -463,7 +370,20 @@ const Camara = ({ route, navigation }) => {
               />
             </View>
             <View style={styles.checkboxContainer}>
-              <Text style={styles.label}>¿Tiene alguna observación?</Text>
+              <Text style={{ textAlign: "center" }}>
+                ¿Si no firmaron todos los jurados hay soporte de inasistencia?
+              </Text>
+              <Checkbox
+                status={checkedFirmasJurados ? "checked" : "unchecked"}
+                onPress={() => {
+                  setCheckedFirmasJurados(!checkedFirmasJurados);
+                }}
+              />
+            </View>
+            <View style={styles.checkboxContainer}>
+              <Text style={{ textAlign: "center" }}>
+                ¿Tiene alguna observación?
+              </Text>
               <Checkbox
                 status={checkedObservacion ? "checked" : "unchecked"}
                 onPress={() => {
@@ -506,6 +426,17 @@ const Camara = ({ route, navigation }) => {
           </TouchableOpacity>
         </Card>
       </ScrollView>
+      <TouchableOpacity style={styles.alertButton}>
+        <Image
+          style={{
+            height: 50,
+            width: 50,
+            resizeMode: "cover",
+          }}
+          tintColor="white"
+          source={require("../assets/alert-icon.png")}
+        />
+      </TouchableOpacity>
     </View>
   ) : (
     <View style={{ flex: 1, justifyContent: "center", alignItems: "center" }}>
@@ -556,13 +487,13 @@ const styles = StyleSheet.create({
   footer: {
     justifyContent: "center",
     alignItems: "center",
-    height: 200,
+    height: 240,
     paddingHorizontal: 20,
   },
   footerObservacion: {
     justifyContent: "center",
     alignItems: "center",
-    height: 280,
+    height: 320,
     paddingHorizontal: 20,
   },
   botonEnviar: {
@@ -607,4 +538,108 @@ const styles = StyleSheet.create({
   rowHeader: {
     flexDirection: "row",
   },
+  alertButton: {
+    position: "absolute",
+    bottom: 5,
+    right: 5,
+    borderRadius: 50,
+    backgroundColor: "red",
+    width: 60,
+    height: 60,
+    padding: 10,
+    borderRadius: 100,
+    alignItems: "center",
+    justifyContent: "center",
+  },
 });
+
+/* {
+  "1": {
+    "Solo partido": "5",
+  },
+  "10": {
+    "Votos": "42",
+  },
+  "11": {
+    "Votos": "0",
+  },
+  "2": {
+    "101": "4",
+    "102": "4",
+    "103": "7",
+    "104": "4",
+    "Solo partido": "5",
+  },
+  "3": {
+    "101": "4",
+    "102": "5",
+    "103": "4",
+    "104": "7",
+    "Solo partido": "1",
+  },
+  "4": {
+    "101": "4",
+    "102": "5",
+    "103": "4",
+    "104": "8",
+    "Solo partido": "5",
+  },
+  "5": {
+    "101": "2",
+    "102": "5",
+    "103": "8",
+    "104": "4",
+    "Solo partido": "4",
+  },
+  "6": {
+    "101": "5",
+    "102": "8",
+    "103": "4",
+    "104": "7",
+    "Solo partido": "2",
+  },
+  "7": {
+    "101": "5",
+    "102": "4",
+    "103": "8",
+    "104": "4",
+    "Solo partido": "2",
+  },
+  "8": {
+    "Votos": "5",
+  },
+  "9": {
+    "Votos": "5",
+  },
+  "login": "Santiago",
+  "observacion": "",
+  "oidMesa": "7",
+  "oidPuesto": "73",
+  "recuento": false,
+  "soporteInasistencia": false,
+  "sufragantes": "200",
+  "tipoTarjeton": "1",
+}
+ */
+
+/* {
+  "1":{"Solo partido":"5"},
+  "2":{"101":"4","102":"4","103":"7","104":"4","Solo partido":"5"},
+  "3":{"101":"4","102":"5","103":"4","104":"7","Solo partido":"1"},
+  "4":{"101":"4","102":"5","103":"4","104":"8","Solo partido":"5"},
+  "5":{"101":"2","102":"5","103":"8","104":"4","Solo partido":"4"},
+  "6":{"101":"5","102":"8","103":"4","104":"7","Solo partido":"2"},
+  "7":{"101":"5","102":"4","103":"8","104":"4","Solo partido":"2"},
+  "8":{"Votos":"5"},
+  "9":{"Votos":"5"},
+  "10":{"Votos":"42"},
+  "11":{"Votos":"0"},
+  "login":"Santiago",
+  "observacion":"",
+  "oidMesa":"7",
+  "oidPuesto":"73",
+  "recuento":false,
+  "soporteInasistencia":false,
+  "sufragantes":"200",
+  "tipoTarjeton":"1"
+} */
