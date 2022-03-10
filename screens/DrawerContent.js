@@ -50,8 +50,8 @@ export function DrawerContent(props) {
               <View style={{ height: 20 }}></View>
               <Text style={styles.captionTitle}>Soporte técnico</Text>
               <Text style={styles.caption}>Lineas de atención:</Text>
-              <Text style={styles.caption}>3112587894</Text>
-              <Text style={styles.caption}>3214587412</Text>
+              <Text style={styles.caption}>3234687462</Text>
+              {/* <Text style={styles.caption}>3214587412</Text> */}
             </View>
             <TouchableOpacity
               style={{ flexDirection: "row", marginTop: 50 }}

@@ -3,16 +3,15 @@ import { NavigationContainer } from "@react-navigation/native";
 import AuthContext from "../components/context/auth/AuthContext";
 import RootStackScreen from "./RootStackScreen";
 import { DrawerContent } from "./DrawerContent";
-
-
 import { createDrawerNavigator } from "@react-navigation/drawer";
 import { View, Image } from "react-native";
-import Camara from "./Camara";
-import Senado from "./Senado";
+import VotosCamaraSenado from "./VotosCamaraSenado";
 import ListaMesas from "./ListaMesas"
 import AgregarMesa from "./AgregarMesa"
 import CamaraSenado from "./CamaraSenado";
 import CamaraSenadoView from "./CamaraSenadoView";
+import Camara from "./Camara";
+import Senado from "./Senado";
 
 
 const Main = (props) => {
@@ -89,6 +88,19 @@ const Main = (props) => {
             }} 
           />
           <Drawer.Screen
+            name="VotosCamaraSenado"
+            component={VotosCamaraSenado}
+            options={{
+              orientation: "portrait",
+              title: "Camara",
+              headerTitleAlign: "center",
+              headerStyle: {
+                backgroundColor: '#FC5C06', //Set Header color
+              },
+              headerTitle: (props) => <LogoTitle {...props} />
+            }} 
+          />
+          <Drawer.Screen
             name="Camara"
             component={Camara}
             options={{
@@ -114,6 +126,7 @@ const Main = (props) => {
               headerTitle: (props) => <LogoTitle {...props} />
             }} 
           />
+
           <Drawer.Screen
             name="CamaraSenadoView"
             component={CamaraSenadoView}

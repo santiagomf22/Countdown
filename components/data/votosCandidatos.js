@@ -1,53 +1,60 @@
-export const votosCandidatos = {
-    "1": { "Solo partido": 0 },
+
+export const estructuraVotosCandidatosCamara = {
+    "1": { "Solo partido": "" },
     "2": {
-      "101": 0,
-      "102": 0,
-      "103": 0,
-      "104": 0,
-      "Solo partido": 0
+      "101": "",
+      "102": "",
+      "103": "",
+      "104": "",
+      "Solo partido": ""
     },
     "3":
-      { "Solo partido": 0, "101": 0, "102": 0, "103": 0, "104": 0 },
+      { "Solo partido": "", "101": "", "102": "", "103": "", "104": "" },
     "4": {
-      "Solo partido": 0,
-      "101": 0,
-      "102": 0,
-      "103": 0,
-      "104": 0
+      "Solo partido": "",
+      "101": "",
+      "102": "",
+      "103": "",
+      "104": ""
     },
     "5": {
-      "Solo partido": 0,
-      "101": 0,
-      "102": 0,
-      "103": 0,
-      "104": 0
+      "Solo partido": "",
+      "101": "",
+      "102": "",
+      "103": "",
+      "104": ""
     },
     "6": {
-      "Solo partido": 0,
-      "101": 0,
-      "102": 0,
-      "103": 0,
-      "104": 0
+      "Solo partido": "",
+      "101": "",
+      "102": "",
+      "103": "",
+      "104": ""
     },
     "7": {
-      "Solo partido": 0,
-      "101": 0,
-      "102": 0,
-      "103": 0,
-      "104": 0
+      "Solo partido": "",
+      "101": "",
+      "102": "",
+      "103": "",
+      "104": ""
     },
     "8": {
-      "Votos": 0
+      "Votos": ""
     },
     "9": {
-      "Votos": 0
+      "Votos": ""
     },
     "10": {
-      "Votos": 0
+      "Votos": ""
     },
     "11": {
-      "Votos": 0
+      "Votos": ""
+    },
+    "25": {
+      "Total votos": ""
+    },
+    "26": {
+      "Total votos": ""
     },
   };
 /* export const votosCandidatos = {

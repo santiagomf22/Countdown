@@ -48,12 +48,9 @@ const AgregarMesa = ({ route, navigation }) => {
     setDisabledButton(true);
 
     axios
-      .post(
-        "http://35.228.188.222/countdown/ws_cd/index.php?municipios",
-        {
-          departamento: "12",
-        }
-      )
+      .post("http://35.228.188.222/countdown/ws_cd/index.php?municipios", {
+        departamento: "12",
+      })
       .then((response) => {
         const municipios = response.data;
         if (municipios) {
@@ -61,7 +58,6 @@ const AgregarMesa = ({ route, navigation }) => {
             setListMunicipios(municipios["Lista de municipios"]);
           } else {
             setListMunicipios([]);
-            console.log("Departamentos no encontradas!");
             Alert.alert(
               "Error",
               "Lo sentimos en este momento no se pudieron cargar los municipios, contacte con el administrador",
@@ -71,7 +67,6 @@ const AgregarMesa = ({ route, navigation }) => {
         } else {
           //loading = true;
           setListMunicipios([]);
-          console.log("Departamentos no encontrados!");
           Alert.alert(
             "Error",
             "Lo sentimos en este momento no se pudieron cargar los municipios, contacte con el administrador",
@@ -84,33 +79,13 @@ const AgregarMesa = ({ route, navigation }) => {
       });
   }, [isFocused]);
 
-  /*  useEffect(() => {
-    console.log("departamento- ",departamento)
-    console.log("municipio- ",municipio)
-    console.log("zona- ",zona)
-    console.log("puesto- ",puesto)
-    if (departamento !== "0" && (municipio !== "0" || zona !== "0" || puesto !== "0")) {
-      setMunicipio("0");
-      setZona("0");
-      setPuesto("0");
-      setMesa("0");
-      console.log('entra en departamento')
-    }
-    if (municipio !== "0") {
-      setZona("0");
-      setPuesto("0");
-      setMesa("0");
-    }
-    if (zona !== "0") {
-      setPuesto("0");
-      setMesa("0");
-    }
-    if (puesto !== "0") {
-      setMesa("0");
-    }
-  }, [departamento, municipio, zona, puesto]); */
-
   const mesaRegistered = () => {
+    let idTarjeton = "";
+    if (id === "camara") {
+      idTarjeton = "1";
+    } else {
+      idTarjeton = "2";
+    }
     const dataMesa = {
       departamento: dataEncabezado.departamento,
       departamentoCod: dataEncabezado.departamentoCod,
@@ -124,8 +99,10 @@ const AgregarMesa = ({ route, navigation }) => {
       zonaCod: dataEncabezado.zonaCod,
       mesa: dataEncabezado.mesa,
       mesaCod: dataEncabezado.mesaCod,
+      tarjeton: idTarjeton,
     };
-    if (id === "camara") {
+
+    if (idTarjeton === "1") {
       navigation.navigate("Camara", { ...dataMesa });
     } else {
       navigation.navigate("Senado", { ...dataMesa });
@@ -159,23 +136,19 @@ const AgregarMesa = ({ route, navigation }) => {
     setMunicipio(itemValue);
     setIsLoadingZonas(true);
     axios
-      .post(
-        "http://35.228.188.222/countdown/ws_cd/index.php?zonas",
-        {
-          municipio: cod,
-        }
-      )
+      .post("http://35.228.188.222/countdown/ws_cd/index.php?zonas", {
+        municipio: cod,
+      })
       .then((response) => {
         setIsLoadingZonas(false);
 
         const zonas = response.data;
-        console.log("Veamos zonas ", zonas);
         if (zonas) {
           if (zonas.status !== 400) {
             setListZonas(zonas["Lista de municipios"]);
           } else {
             console.log("Zonas no encontradas!");
-            setListZonas([])
+            setListZonas([]);
             Alert.alert(
               "Error",
               "Lo sentimos en este momento no se pudieron cargar las zonas",
@@ -184,7 +157,12 @@ const AgregarMesa = ({ route, navigation }) => {
           }
         } else {
           //loading = true;
-          console.log("Zonas no encontradas!");
+          //console.log("Zonas no encontradas!");
+          Alert.alert(
+            "Error",
+            "No se encontraron zonas para este municipio",
+            [{ text: "Entendido" }]
+          );
         }
       })
       .catch((e) => {
@@ -204,14 +182,11 @@ const AgregarMesa = ({ route, navigation }) => {
       zonaCod: cod,
     }));
     setZona(itemValue);
-    console.log("El codigo zona es: ", cod)
+    console.log("El codigo zona es: ", cod);
     axios
-      .post(
-        "http://35.228.188.222/countdown/ws_cd/index.php?puestos",
-        {
-          zona: cod,
-        }
-      )
+      .post("http://35.228.188.222/countdown/ws_cd/index.php?puestos", {
+        zona: cod,
+      })
       .then((response) => {
         setIsLoadingPuestos(false);
 
@@ -243,6 +218,12 @@ const AgregarMesa = ({ route, navigation }) => {
   };
   const onChangePuesto = (itemValue) => {
     setIsLoadingMesas(true);
+    let idTarjeton = "";
+    if (id === "camara") {
+      idTarjeton = "1";
+    } else {
+      idTarjeton = "2";
+    }
     let separate = itemValue.split("*");
     let cod = separate[0];
     let nom = separate[1];
@@ -253,16 +234,18 @@ const AgregarMesa = ({ route, navigation }) => {
     }));
     setPuesto(itemValue);
     axios
-      .post(
-        "http://35.228.188.222/countdown/ws_cd/index.php?mesas",
-        {
-          puesto: cod,
-          user: userName,
-        }
-      )
+      .post("http://35.228.188.222/countdown/ws_cd/index.php?mesas", {
+        puesto: cod,
+        user: userName,
+        oidTarjeton: idTarjeton,
+      })
       .then((response) => {
         setIsLoadingMesas(false);
         const mesas = response.data;
+        console.log("Mesas: ", response.data);
+        console.log("Mesas: ", cod);
+        console.log("Mesas: ", userName);
+        console.log("Mesas: ", idTarjeton);
         if (mesas) {
           if (mesas.status !== 400) {
             console.log("Mesas ", mesas);

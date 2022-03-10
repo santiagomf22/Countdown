@@ -1,5 +1,5 @@
 
-export const partidos = [
+export const partidosCamara = [
     {
       partido: "NIVELACIÓN DE LA MESA",
       texto1: "Total sufragantes formato E-11",
@@ -20,7 +20,7 @@ export const partidos = [
     {
       partido: "COALICIÓN PARTIDOS CONSERVADOR COLOMBIANO - COLOMBIA JUSTA Y LIBRES - PARTIDO SALVACIÓN NACIONAL",
       oid:"3",
-      imagen: require("../../assets/conservador.png"),
+      imagen: require("../../assets/cr-sn-cj.png"),
       candidatos: ["Solo partido", "101", "102", "103", "104"],
     },
     {
@@ -38,7 +38,7 @@ export const partidos = [
     {
       partido: "COALICIÓN PARTIDO CAMBIO RADICAL Y PARTIDO POLITICO MIRA",
       oid:"6",
-      imagen: require("../../assets/cambio_radical.png"),
+      imagen: require("../../assets/mira-radical.png"),
       candidatos: ["Solo partido", "101", "102", "103", "104"],
     },
     {
@@ -66,9 +66,25 @@ export const partidos = [
       candidatos: ["Votos"],
     },
     {
+      partido: "CIRCUNSCRIPCIÓN ESPECIAL COMUNIDADES INDIGENAS",
+      oid:"25",
+      imagen: require("../../assets/indigena.png"),
+      info:"Este es el totalizador de comunidades indigenas para las listas, votos en blanco, votos nulos y votos no marcados",
+      candidatos: ["Total votos"],
+    },
+    {
+      partido: "CIRCUNSCRIPCIÓN COMUNIDADES AFRO-DESCENDIENTES",
+      oid:"26",
+      imagen: require("../../assets/afro.png"),
+      info:"Este es el totalizador de comunidades afro-descendientes para las listas, votos en blanco, votos nulos y votos no marcados",
+      candidatos: ["Total votos"],
+    },
+    {
       partido: "VOTOS INCINERADOS",
       oid:"11",
       imagen: require("../../assets/voto_incinerado.png"),
       candidatos: ["Votos"],
     },
+    
+    
   ];

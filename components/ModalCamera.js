@@ -26,34 +26,6 @@ function ModalCamera(props) {
 
     const result = await ImagePicker.launchImageLibraryAsync();
 
-    /* let localUri = result.uri;
-    let filename = localUri.split("/").pop();
-
-    // Infer the type of the image
-    let match = /\.(\w+)$/.exec(filename);
-    let type = match ? `image/${match[1]}` : `image`;
-
-    const formData = new FormData();
-    formData.append('file', { uri: localUri, name: filename, type }); */
-
-    /* let fecha = new Date();
-    let { type, uri } = result;
-    const fileToUpload = {
-      name: "minion.jpg",
-      uri,
-      fecha,
-      type: "application/" + type,
-    };
-    console.log("File to upload ", fileToUpload);
-    formData.append("file", fileToUpload);
-    formData.append("login", userName);
-    formData.append("oidMesa", mesaCod); */
-    /* formData.append("oidPuesto", puestoCod);
-    formData.append("oidTarjeton", 1);  */
-
-    // Explore the result
-    //console.log("imagen ", result);
-
     if (!result.cancelled) {
       props.uriImage(result);
     }
@@ -65,7 +37,7 @@ function ModalCamera(props) {
     const permissionResult = await ImagePicker.requestCameraPermissionsAsync();
 
     if (permissionResult.granted === false) {
-      alert("You've refused to allow this appp to access your camera!");
+      alert("Has rechazado el acceso a la camara de la aplicacion!");
       return;
     }
 
@@ -75,7 +47,7 @@ function ModalCamera(props) {
     });
 
     // Explore the result
-    console.log(result);
+    //console.log(result);
 
     if (!result.cancelled) {
       props.uriImage(result);

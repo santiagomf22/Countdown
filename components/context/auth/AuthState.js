@@ -28,7 +28,7 @@ const AuthState = (props) => {
           userName = await AsyncStorage.getItem("userName");
           nombre = await AsyncStorage.getItem("Name");
           rol = await AsyncStorage.getItem("Rol");
-          console.log("Rol authstate: ",rol)
+          // console.log("Rol authstate: ",rol)
         } catch (e) {
           console.log(e);
         }

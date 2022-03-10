@@ -20,7 +20,6 @@ const CamaraSenado = (props) => {
   return (
     <View style={styles.container}>
       <Card style={ rol === "2" ? styles.buttonDisabled : styles.button } >
-        {console.log("ROL ",rol)}
         <TouchableOpacity disabled={rol === "2" ? true : false} onPress={pressCamara}>
           <Text style={styles.text}>CAMARA</Text>
         </TouchableOpacity>

@@ -5,6 +5,7 @@ import {
   TouchableOpacity,
   TextInput,
   StyleSheet,
+  Alert,
 } from "react-native";
 import * as Animatable from "react-native-animatable";
 import FontAwesome from "react-native-vector-icons/FontAwesome";
@@ -41,6 +42,20 @@ function Form(props) {
       });
     }
   };
+
+  const fetchLogin = (username,password) => {
+    if(!data.isValidUser){
+      Alert.alert("Error!", "El usuario debe tener al menos 4 caracteres", [
+        { text: "Entendido" },
+      ]);
+    }else if(!data.isValidPassword){
+      Alert.alert("Error!", "La contraseña debe tener al menos 4 caracteres", [
+        { text: "Entendido" },
+      ]);
+    }else{
+      props.loginHandle(username, password)
+    }
+  }
 
   const handlePasswordChange = (val) => {
     if (val.trim().length >= 6) {
@@ -166,7 +181,7 @@ function Form(props) {
           label="Iniciar Sesión"
           styleText={{fontSize:19}}
           styleButton={{height:45,backgroundColor:'#FC5C06'}}
-          onPress={() => props.loginHandle(data.username, data.password)}
+          onPress={() => fetchLogin(data.username, data.password)}
         />
       </View>
     </View>

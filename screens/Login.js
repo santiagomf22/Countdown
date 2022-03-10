@@ -1,4 +1,4 @@
-import React, { useContext } from "react";
+import React, { useContext, useState } from "react";
 import {
   View,
   Text,
@@ -18,6 +18,7 @@ import { normalizeFontSize } from "../components/normalizeFontSize";
 function Login() {
   const { authContext } = useContext(AuthContext);
   const widthScreen = Dimensions.get("window").width;
+  const [isLoading, setIsLoading] = useState(false);
 
   const loginHandle = (userName, password) => {
     axios
@@ -29,18 +30,34 @@ function Login() {
         // Respuesta del servidor
         const foundUser = response.data.datos_user;
         const status = response.data.status;
-        console.log(response.data);
+        //console.log(response.data);
         if (status === 200) {
           authContext.signIn(foundUser);
-        }
-        if (status === 405) {
+        } else if (status === 401) {
           Alert.alert("Error!", "El usuario o la clave son incorrectos", [
             { text: "Entendido" },
           ]);
           return;
+        } else if (status === 405) {
+          Alert.alert("Error!", "El usuario o la clave son incorrectos", [
+            { text: "Entendido" },
+          ]);
+          return;
+        } else {
+          Alert.alert(
+            "Error!",
+            "Disculpe las molestias, vuelva a intentarlo de nuevo o comuniquese con un administrador",
+            [{ text: "Entendido" }]
+          );
+          return;
         }
       })
       .catch((e) => {
+        Alert.alert(
+          "Error!",
+          "Disculpe las molestias, vuelva a intentarlo de nuevo o comuniquese con un administrador",
+          [{ text: "Entendido" }]
+        );
         console.log(e);
       });
 
@@ -71,16 +88,27 @@ function Login() {
             color: "#FEF92C",
             fontSize: 0.033 * widthScreen,
             fontWeight: "bold",
-            paddingBottom:20
+            paddingBottom: 20,
           }}
         >
           ASESORIA PROFESIONAL EN MATERIA ELECTORAL
-          {console.log(normalizeFontSize(10))}
         </Text>
       </View>
       <View style={styles.viewForm}>
         <View>
-          <Form loginHandle={loginHandle} />
+          {!isLoading ? (
+            <Form loginHandle={loginHandle} />
+          ) : (
+            <View
+              style={{
+                flex: 1,
+                justifyContent: "center",
+                alignItems: "center",
+              }}
+            >
+              <ActivityIndicator size="large" color="#FC5C06" />
+            </View>
+          )}
         </View>
       </View>
       <View style={styles.footer}>
@@ -111,7 +139,7 @@ const styles = StyleSheet.create({
     width: "80%",
     height: "40%",
     resizeMode: "center",
-    marginTop:20,
+    marginTop: 20,
   },
   texto_bienvenido: {
     marginTop: "20%",

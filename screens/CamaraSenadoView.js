@@ -1,4 +1,4 @@
-import React, { useContext, useEffect, useRef, useState } from "react";
+import React, { useEffect, useState } from "react";
 import {
   View,
   Text,
@@ -6,32 +6,25 @@ import {
   ScrollView,
   TextInput,
   StyleSheet,
-  TouchableOpacity,
   Alert,
-  Modal,
+  TouchableOpacity
 } from "react-native";
 import { ActivityIndicator, Checkbox } from "react-native-paper";
 import { Card } from "react-native-paper";
 import { partidoImages } from "../components/data/partidosImages";
-import { votosCandidatos } from "../components/data/votosCandidatos";
 import { useIsFocused } from "@react-navigation/native";
-import AuthContext from "../components/context/auth/AuthContext";
 import axios from "axios";
+import ModalSoportes from "../components/ModalSoportes"
 
 // import Card from "../components/UX/Card"
 
 const CamaraSenadoView = ({ route, navigation }) => {
-  const [votos, setVotos] = useState(votosCandidatos);
   const [totalVotos, setTotalVotos] = useState(0);
-  const [checkVoto, setCheckVoto] = useState({});
-  const [votosMesa, setVotosMesa] = useState(0);
   const [checkedRecuento, setCheckedRecuento] = useState(false);
   const [checkedObservacion, setCheckedObservacion] = useState(false);
   const [checkedFirmasJurados, setCheckedFirmasJurados] = useState(false);
-
   const [textObservacion, setTextObservacion] = useState("");
   const [soporte, setSoporte] = useState("");
-  const [uriImage, setUriImage] = useState("");
   const isFocused = useIsFocused();
   const [listaDatos, setListaDatos] = useState([]);
   const [totalSufragantes, setTotalSufragantes] = useState();
@@ -46,98 +39,107 @@ const CamaraSenadoView = ({ route, navigation }) => {
     mesa,
     oidMesaVotacion,
   } = route.params;
-  const { userName } = useContext(AuthContext);
+  const [showModalSoportes,setShowModalSoportes] = useState(false)
+
+ /*  useEffect(() => {
+    const unsubscribe = navigation.addListener('focus', () => {
+    })
+    return unsubscribe;
+}, [navigation]); */
 
   useEffect(() => {
-    console.log("Tarjeton: ",tarjeton)
-    console.log("oidmesaVotacion ", oidMesaVotacion);
-    setIsLoading(true);
-    if(tarjeton )
-    axios
-      //IP PRUEBA http://35.231.9.84:8091/scriptcase/app/CountDown/ws_cd/index.php?resultadoT
-      //IP PRODUCCION http://35.228.188.222/countdown/ws_cd/index.php?resultadoT
-      .post(
-        "http://35.228.188.222/countdown/ws_cd/index.php?resultadoT",
-        {
-          oidMesaVotacion: oidMesaVotacion,
-          oidTarjeton: tarjeton
-        }
-      )
-      .then((response) => {
-        // Respuesta del servidor
-        const status = response.data.status;
-        console.log("Todo correcto", response.data);
-        setIsLoading(false);
-
-        if (status === 200) {
-          const listaD = response.data["Lista de datos"];
-          // const listaD = response.data["Lista de datos"];
-          const observacionR = response.data["observacion"];
-          const sufragantesR = response.data["sufragantes"];
-          const totalVotosUrnaR = response.data["totalVotosUrnas"];
-          const soporteInasistenciaR = response.data["soporteInasistencia"];
-          const recuentoR = response.data["recuento"];
-          setTextObservacion(observacionR);
-          if (observacionR !== "") {
-            setCheckedObservacion(true);
-          } else {
-            setCheckedObservacion(false);
-          }
-          setTotalSufragantes(sufragantesR);
-          setTotalVotos(totalVotosUrnaR);
-          let recuentoB = false;
-          if (recuentoR === "1") {
-            recuentoB = true;
-          }
-          console.log("Recuento ", recuentoB);
-
-          setCheckedRecuento(recuentoB);
-          let juradosB = false;
-          if (soporteInasistenciaR === "1") {
-            juradosB = true;
-          }
-          setCheckedFirmasJurados(juradosB);
-
-          listaD.sort((a, b) => {
-            return a["Cod Partido"] - b["Cod Partido"];
-          });
-
-          setListaDatos(listaD);
-        }
-        if (status === 400) {
-          Alert.alert("Error!", "Disculpe las molestias, vuelva a intentarlo", [
-            { text: "Entendido" },
-          ]);
-          return;
-        }
-        if (status === 405) {
-          Alert.alert("Error!", "Los datos no se registraron correctamente", [
-            { text: "Entendido" },
-          ]);
-          return;
-        }
-        /* if (status === undefined || !status) {
-          returnHome();
-        } */
-      })
-      .catch((e) => {
-        console.log(e);
-        setIsLoading(false);
-      });
+    console.log('oidTarjeton', tarjeton)
+      console.log('oidMesaVotacion', oidMesaVotacion)
+      cleanData()
+      setIsLoading(true);
+      fetchData()
   }, [isFocused]);
 
   const cleanData = () => {
-    setTotalVotos({});
-    setCheckVoto({});
-    setVotosMesa(0);
+    setTotalVotos(0);
     setTextObservacion("");
     setSoporte("");
-    setAllRight(false);
-    setShowModal(false);
-    setShowCamera(false);
     setTotalSufragantes();
-    setConteoCorrecto(false);
+    setListaDatos([])
   };
+
+  const fetchData = () =>{
+    if(tarjeton )
+      axios
+        //IP PRUEBA http://35.231.9.84:8091/scriptcase/app/CountDown/ws_cd/index.php?resultadoT
+        //IP PRODUCCION http://35.228.188.222/countdown/ws_cd/index.php?resultadoT
+        .post(
+          "http://35.228.188.222/countdown/ws_cd/index.php?resultadoT",
+          {
+            oidMesaVotacion: oidMesaVotacion,
+            oidTarjeton: tarjeton
+          }
+        )
+        .then((response) => {
+          // Respuesta del servidor
+          const status = response.data.status;
+          console.log("Response", response.data);
+          setIsLoading(false);
+  
+          if (status === 200) {
+            const listaD = response.data["Lista de datos"];
+            // const listaD = response.data["Lista de datos"];
+            const observacionR = response.data["observacion"];
+            const sufragantesR = response.data["sufragantes"];
+            const totalVotosUrnaR = response.data["totalVotosUrnas"];
+            const soporteInasistenciaR = response.data["soporteInasistencia"];
+            const recuentoR = response.data["recuento"];
+            const soporteE14 = response.data["url"];
+            setSoporte(soporteE14)
+            setTextObservacion(observacionR);
+            if (observacionR !== "") {
+              setCheckedObservacion(true);
+            } else {
+              setCheckedObservacion(false);
+            }
+            setTotalSufragantes(sufragantesR);
+            setTotalVotos(totalVotosUrnaR);
+            let recuentoB = false;
+            if (recuentoR === "1") {
+              recuentoB = true;
+            }
+  
+            setCheckedRecuento(recuentoB);
+            let juradosB = false;
+            if (soporteInasistenciaR === "1") {
+              juradosB = true;
+            }
+            setCheckedFirmasJurados(juradosB);
+  
+            listaD.sort((a, b) => {
+              return a["Cod Partido"] - b["Cod Partido"];
+            });
+  
+            setListaDatos(listaD);
+          }
+          if (status === 400) {
+            Alert.alert("Error!", "Disculpe las molestias, vuelva a intentarlo", [
+              { text: "Entendido" },
+            ]);
+            return;
+          }
+          if (status === 405) {
+            Alert.alert("Error!", "Los datos no se registraron correctamente", [
+              { text: "Entendido" },
+            ]);
+            return;
+          }
+        })
+        .catch((e) => {
+          console.log(e);
+          setIsLoading(false);
+        });
+  }
+
+  
+  const hideModalSoportes = () =>{
+    setShowModalSoportes(false)
+  }
 
   return !isLoading ? (
     <View
@@ -147,6 +149,11 @@ const CamaraSenadoView = ({ route, navigation }) => {
         alignItems: "center",
       }}
     >
+      <ModalSoportes
+        visible={showModalSoportes}
+        onCancel={hideModalSoportes}
+        soportes={soporte}
+      />
       <ScrollView>
         <Card>
           <View style={{ padding: 10 }}>
@@ -165,9 +172,9 @@ const CamaraSenadoView = ({ route, navigation }) => {
             <View
               style={{ flexDirection: "row", justifyContent: "space-around" }}
             >
-              <Text>ZONA: {zona} </Text>
+              <Text>ZONA: {zona.split(" ")[1]} </Text>
               <Text>PUESTO: {puesto} </Text>
-              <Text>MESA: {mesa}</Text>
+              <Text>MESA: {mesa.split(" ")[1]}</Text>
             </View>
           </View>
         </Card>
@@ -198,7 +205,7 @@ const CamaraSenadoView = ({ route, navigation }) => {
               <TextInput
                 keyboardType="numeric"
                 style={styles.inputNivel}
-                placeholder={totalSufragantes}
+                placeholder={`${totalVotos}`}
               />
             </View>
           </View>
@@ -298,6 +305,13 @@ const CamaraSenadoView = ({ route, navigation }) => {
               !checkedObservacion ? styles.footer : styles.footerObservacion
             }
           >
+            <TouchableOpacity style={styles.botonVerSoporte} onPress={()=>setShowModalSoportes(true)}>
+              <Text style={styles.textoBotonVer}>
+                Ver soportes
+              </Text>
+            </TouchableOpacity>
+
+
             <View style={styles.checkboxContainer}>
               <Text style={styles.label}>¿Hubo recuento de votos?</Text>
               <Checkbox
@@ -402,13 +416,13 @@ const styles = StyleSheet.create({
   footer: {
     justifyContent: "center",
     alignItems: "center",
-    height: 200,
+    height: 250,
     paddingHorizontal: 20,
   },
   footerObservacion: {
     justifyContent: "center",
     alignItems: "center",
-    height: 280,
+    height: 330,
     paddingHorizontal: 20,
   },
   botonEnviar: {
@@ -419,7 +433,7 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     height: 50,
   },
-  botonCargarSoporte: {
+  botonVerSoporte: {
     backgroundColor: "#007aff",
     paddingHorizontal: 30,
     paddingVertical: 5,
@@ -431,7 +445,7 @@ const styles = StyleSheet.create({
     color: "white",
     fontSize: 18,
   },
-  textoBotonCargar: {
+  textoBotonVer: {
     color: "white",
     fontSize: 15,
   },
